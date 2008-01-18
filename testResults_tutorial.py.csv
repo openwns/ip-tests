@@ -1,0 +1,4 @@
+id, name
+./referenceOutput_tutorial.py, REFERENCE
+./output_dbg_tutorial.py, DBG
+./output_opt_tutorial.py, OPT
