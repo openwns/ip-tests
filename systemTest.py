@@ -50,7 +50,7 @@ if __name__ == '__main__':
     # This is only evaluated if the script is called by hand
 
     # if you need to change the verbosity do it here
-    verbosity = 1
+    verbosity = 2
 
     pywns.WNSUnit.verbosity = verbosity
 

@@ -61,6 +61,12 @@ for i in xrange(numSubnets):
 
 # Populate subnets
 hostnum = 1
+STATION    = 1
+ROUTER     = 2
+ARPSERVER  = 3
+DHCPSERVER = 4
+DNSSERVER  = 5
+
 for subnet in subnets:
     wire = copper.Copper.Wire(str(subnet) + ".wire")
     defaultRouterAddress = subnet + 1
@@ -69,15 +75,21 @@ for subnet in subnets:
                               _wire = wire,
                               _domainName = domainName,
                               _defaultRouter = str(defaultRouterAddress))
+    station.addConstantContextProvider("nodeType", STATION)
+
     router = Router_10BaseT(_name = "Router" + str(hostnum) + ".wns.org",
                             _domainName = str(subnet + 1))
+    router.addConstantContextProvider("nodeType", ROUTER)
 
     varp = VirtualARPServer("vARP"+str(hostnum)+"@", wire.name)
+    varp.addConstantContextProvider("nodeType", ARPSERVER)
 
     vdhcp = VirtualDHCPServer("vDHCP" + str(hostnum) + "@",
                               wire.name,
                               subnet + 10, subnet + 240,
                               "255.255.255.0")
+    vdhcp.addConstantContextProvider("nodeType", DHCPSERVER)
+
     WNS.nodes.append(vdhcp)
 
     WNS.nodes.append(varp)
@@ -120,9 +132,23 @@ for i in range(len(stations)):
 
 # Add nodes to scenario
 vdns = VirtualDNSServer("vDNS", "ip.DEFAULT.GLOBAL")
+vdns.addConstantContextProvider("nodeType", DNSSERVER)
 WNS.nodes.append(vdns)
 WNS.nodes += stations + routers
 
 WNS.maxSimTime = 1000.0
 
 wns.Logger.globalRegistry.setAttribute("IP", "enabled", True)
+
+# disable old style probes
+WNS.modules.ip.probes = {}
+
+# add new style probes of ip
+# since we have 10BaseT here maxBitThroughPut of 10E6 Bit is sufficient
+ipSubTrees = ip.Probes.getPDFSubTrees(maxPacketDelay = 0.5,     # s
+                                      maxPacketSize = 2000*8,   # Bit
+                                      maxBitThroughput = 10E6,  # Bit/s
+                                      maxPacketThroughput = 1E6 # Packets/s
+                                      )
+
+WNS.environment.probeBusRegistry.insertSubTrees(ipSubTrees)
