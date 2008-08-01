@@ -9,6 +9,7 @@ from ip.VirtualDNS import VirtualDNSServer
 from ip.VirtualDHCP import VirtualDHCPServer
 from ip.Address import ipv4Address
 from ip.IP import IP
+import ip.evaluation.default
 import copper.Copper
 import glue
 import glue.support.Configuration
@@ -88,3 +89,13 @@ constanze2.addListener(ipListenerBinding, listener)
 WNS.nodes += [node1, router1, router2, node2, vdns, varp1, varp2, varp3, varp4, vdhcp1, vdhcp2]
 
 WNS.maxSimTime = 100.0
+
+# add new style probes of ip
+# since we have 10BaseT here maxBitThroughPut of 10E6 Bit is sufficient
+ip.evaluation.default.installEvaluation(sim = WNS,
+                                        maxPacketDelay = 0.5,     # s
+                                        maxPacketSize = 2000*8,   # Bit
+                                        maxBitThroughput = 10E6,  # Bit/s
+                                        maxPacketThroughput = 1E6 # Packets/s
+                                 )
+

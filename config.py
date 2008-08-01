@@ -5,12 +5,14 @@ import wns.Distribution
 import ip
 from constanze.Constanze import Constanze, CBR
 from constanze.Node import ConstanzeComponent, IPBinding, IPListenerBinding, Listener
+import constanze.evaluation.default
 from ip.BackboneHelpers import Router_10BaseT, Station_10BaseT
 from ip.VirtualARP import VirtualARPServer
 from ip.VirtualDNS import VirtualDNSServer
 from ip.VirtualDHCP import VirtualDHCPServer
 from ip.Address import ipv4Address
 from ip.IP import IP
+import ip.evaluation.default
 import copper.Copper
 import glue
 import glue.support.Configuration
@@ -122,12 +124,12 @@ for i in range(len(stations)):
     destination = stations[i-2].ip.domainName
     ipBinding = IPBinding(source, destination)
 
-    constanze = ConstanzeComponent(stations[i], source + ".constanze")
-    constanze.addTraffic(ipBinding, CBR(0.00001, 1024, 1024))
+    constanzeC = ConstanzeComponent(stations[i], source + ".constanze")
+    constanzeC.addTraffic(ipBinding, CBR(0.00001, 1024, 1024))
 
     listener = Listener(source + ".listener")
     ipListenerBinding = IPListenerBinding(source)
-    constanze.addListener(ipListenerBinding, listener)
+    constanzeC.addListener(ipListenerBinding, listener)
 
 
 # Add nodes to scenario
@@ -136,19 +138,28 @@ vdns.addConstantContextProvider("nodeType", DNSSERVER)
 WNS.nodes.append(vdns)
 WNS.nodes += stations + routers
 
-WNS.maxSimTime = 1000.0
+WNS.maxSimTime = 10.0
 
 wns.Logger.globalRegistry.setAttribute("IP", "enabled", True)
 
-# disable old style probes
-WNS.modules.ip.probes = {}
 
 # add new style probes of ip
 # since we have 10BaseT here maxBitThroughPut of 10E6 Bit is sufficient
-ipSubTrees = ip.Probes.getPDFSubTrees(maxPacketDelay = 0.5,     # s
-                                      maxPacketSize = 2000*8,   # Bit
-                                      maxBitThroughput = 10E6,  # Bit/s
-                                      maxPacketThroughput = 1E6 # Packets/s
-                                      )
+constanze.evaluation.default.installEvaluation(sim = WNS,
+                                               maxPacketDelay = 1.0,
+                                               maxPacketSize = 16000,
+                                               maxBitThroughput = 100e6,
+                                               maxPacketThroughput = 10e6,
+                                               delayResolution = 1000,
+                                               sizeResolution = 2000,
+                                               throughputResolution = 10000)
 
-WNS.environment.probeBusRegistry.insertSubTrees(ipSubTrees)
+
+ip.evaluation.default.installEvaluation(sim = WNS,
+                                       maxPacketDelay = 0.5,     # s
+                                       maxPacketSize = 2000*8,   # Bit
+                                       maxBitThroughput = 10E6,  # Bit/s
+                                       maxPacketThroughput = 1E6 # Packets/s
+                                       )
+
+
