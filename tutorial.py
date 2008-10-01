@@ -8,7 +8,8 @@ from ip.VirtualARP import VirtualARPServer
 from ip.VirtualDHCP import VirtualDHCPServer
 from ip.VirtualDNS import VirtualDNSServer
 
-import constanze
+import constanze.Node
+import constanze.Constanze
 import constanze.evaluation.default
 
 leftWire = copper.Copper.Wire("LeftWire")
