@@ -14,7 +14,7 @@ import pywns.WNSUnit
 
 # create a system test
 testSuite1 = pywns.WNSUnit.ProbesTestSuite(sandboxPath = os.path.join('..', '..', '..', 'sandbox'),
-                                    executeable = "wns-core",
+                                    
                                     configFile = 'config.py',
                                     shortDescription = 'A ring of three subnets to test IP',
                                     disabled = False,
@@ -24,7 +24,7 @@ testSuite1 = pywns.WNSUnit.ProbesTestSuite(sandboxPath = os.path.join('..', '..'
 
 # create a system test
 testSuite2 = pywns.WNSUnit.ProbesTestSuite(sandboxPath = os.path.join('..', '..', '..', 'sandbox'),
-                                    executeable = "wns-core",
+                                    
                                     configFile = 'configTunnel.py',
                                     shortDescription = 'Simple Initial Tunneling Test',
                                     disabled = False,
@@ -34,7 +34,7 @@ testSuite2 = pywns.WNSUnit.ProbesTestSuite(sandboxPath = os.path.join('..', '..'
 
 # create a system test
 testSuite3 = pywns.WNSUnit.ProbesTestSuite(sandboxPath = os.path.join('..', '..', '..', 'sandbox'),
-                                    executeable = "wns-core",
+                                    
                                     configFile = 'tutorial.py',
                                     shortDescription = 'Tutorial Scenario for IP module. Please update documentation if you modify things here!',
                                     requireReferenceOutput = False,

@@ -14,7 +14,7 @@ import pywns.WNSUnit
 
 # create a system test
 testSuite1 = pywns.WNSUnit.ProbesTestSuite(sandboxPath = os.path.join('..', '..', '..', 'sandbox'),
-                                    executeable = "wns-core",
+                                    
                                     configFile = 'configLong.py',
                                     shortDescription = 'A ring of 120 subnets to stress test IP',
                                     disabled = False,
