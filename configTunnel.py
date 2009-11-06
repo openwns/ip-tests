@@ -1,8 +1,8 @@
-import wns.WNS
-import wns.Distribution
+import openwns
+import openwns.distribution
 import ip
-from constanze.Constanze import Constanze, CBR
-from constanze.Node import ConstanzeComponent, IPBinding, IPListenerBinding, Listener
+from constanze.traffic import CBR
+from constanze.node import ConstanzeComponent, IPBinding, IPListenerBinding, Listener
 from ip.BackboneHelpers import Router_10BaseT, Station_10BaseT
 from ip.VirtualARP import VirtualARPServer
 from ip.VirtualDNS import VirtualDNSServer
@@ -16,8 +16,8 @@ import glue.support.Configuration
 
 # create an instance of the WNS configuration
 # The variable must be called WNS!!!!
-WNS = wns.WNS.WNS()
-WNS.outputStrategy = wns.WNS.OutputStrategy.DELETE
+WNS = openwns.Simulator(simulationModel = openwns.node.NodeSimulationModel())
+WNS.outputStrategy = openwns.simulator.OutputStrategy.DELETE
 
 domainName1 = "vpnclient.ip.wns.org"
 wire1 = copper.Copper.Wire("public1.wire")
@@ -86,7 +86,7 @@ listener = Listener(destination + ".listener")
 ipListenerBinding = IPListenerBinding(destination)
 constanze2.addListener(ipListenerBinding, listener)
 
-WNS.nodes += [node1, router1, router2, node2, vdns, varp1, varp2, varp3, varp4, vdhcp1, vdhcp2]
+WNS.simulationModel.nodes += [node1, router1, router2, node2, vdns, varp1, varp2, varp3, varp4, vdhcp1, vdhcp2]
 
 WNS.maxSimTime = 100.0
 
@@ -99,3 +99,4 @@ ip.evaluation.default.installEvaluation(sim = WNS,
                                         maxPacketThroughput = 1E6 # Packets/s
                                  )
 
+openwns.setSimulator(WNS)

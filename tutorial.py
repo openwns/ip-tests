@@ -1,4 +1,5 @@
-import wns.WNS
+import openwns
+import openwns.logger
 import ip
 import ip.evaluation.default
 import copper.Copper
@@ -8,8 +9,8 @@ from ip.VirtualARP import VirtualARPServer
 from ip.VirtualDHCP import VirtualDHCPServer
 from ip.VirtualDNS import VirtualDNSServer
 
-import constanze.Node
-import constanze.Constanze
+import constanze.node
+import constanze.traffic
 import constanze.evaluation.default
 
 leftWire = copper.Copper.Wire("LeftWire")
@@ -81,24 +82,26 @@ dns = VirtualDNSServer(name = "DNS",
 		       zoneIdentifier = "ip.DEFAULT.GLOBAL")
 
 # Traffic Configuration
-ipBinding = constanze.Node.IPBinding("leftStation.wns.org", "rightStation.wns.org")
-leftConstanze = constanze.Node.ConstanzeComponent(leftStation, "leftStation.constanze")
-leftConstanze.addTraffic(ipBinding, constanze.Constanze.CBR(offset = 0.01,
+ipBinding = constanze.node.IPBinding("leftStation.wns.org", "rightStation.wns.org")
+leftConstanze = constanze.node.ConstanzeComponent(leftStation, "leftStation.constanze")
+leftConstanze.addTraffic(ipBinding, constanze.traffic.CBR(offset = 0.01,
                                                             throughput = 1024,
                                                             packetSize = 1024))
 # Traffic Sink Configuration
-listener = constanze.Node.Listener("rightStation.listener")
-ipListenerBinding = constanze.Node.IPListenerBinding("rightStation.wns.org")
-rightConstanze = constanze.Node.ConstanzeComponent(rightStation, "rightStation.constanze")
+listener = constanze.node.Listener("rightStation.listener")
+ipListenerBinding = constanze.node.IPListenerBinding("rightStation.wns.org")
+rightConstanze = constanze.node.ConstanzeComponent(rightStation, "rightStation.constanze")
 rightConstanze.addListener(ipListenerBinding, listener)
 
-WNS = wns.WNS.WNS()
-WNS.nodes = [leftStation, rightStation,
+WNS = openwns.Simulator(simulationModel = openwns.node.NodeSimulationModel())
+WNS.outputStrategy = openwns.simulator.OutputStrategy.DELETE
+
+WNS.simulationModel.nodes = [leftStation, rightStation,
              router1, router2,
 	     leftARP, leftDHCP, rightARP, rightDHCP, middleARP, middleDHCP, dns]
 WNS.maxSimTime = 100.0
 
-wns.Logger.globalRegistry.setAttribute("IP", "enabled", True)
+openwns.logger.globalRegistry.setAttribute("IP", "enabled", True)
 
 
 # add new style probes of ip
@@ -120,4 +123,5 @@ ip.evaluation.default.installEvaluation(sim = WNS,
                                        maxPacketThroughput = 1E6 # Packets/s
                                        )
 
+openwns.setSimulator(WNS)
 

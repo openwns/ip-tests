@@ -1,10 +1,11 @@
 # import the WNS module. Contains all sub-classes needed for
 # configuration of WNS
-import wns.WNS
-import wns.Distribution
+import openwns
+import openwns.logger
+import openwns.distribution
 import ip
-from constanze.Constanze import Constanze, CBR
-from constanze.Node import ConstanzeComponent, IPBinding, IPListenerBinding, Listener
+from constanze.traffic import CBR
+from constanze.node import ConstanzeComponent, IPBinding, IPListenerBinding, Listener
 import constanze.evaluation.default
 from ip.BackboneHelpers import Router_10BaseT, Station_10BaseT
 from ip.VirtualARP import VirtualARPServer
@@ -19,8 +20,8 @@ import glue.support.Configuration
 
 # create an instance of the WNS configuration
 # The variable must be called WNS!!!!
-WNS = wns.WNS.WNS()
-WNS.outputStrategy = wns.WNS.OutputStrategy.DELETE
+WNS = openwns.Simulator(simulationModel = openwns.node.NodeSimulationModel())
+WNS.outputStrategy = openwns.simulator.OutputStrategy.DELETE
 
 # number of stations (min = 3)
 numSubnets = 10
@@ -92,9 +93,9 @@ for subnet in subnets:
                               "255.255.255.0")
     vdhcp.addConstantContextProvider("nodeType", DHCPSERVER)
 
-    WNS.nodes.append(vdhcp)
+    WNS.simulationModel.nodes.append(vdhcp)
 
-    WNS.nodes.append(varp)
+    WNS.simulationModel.nodes.append(varp)
     wires.append(wire)
     stations.append(station)
     routers.append(router)
@@ -135,12 +136,12 @@ for i in range(len(stations)):
 # Add nodes to scenario
 vdns = VirtualDNSServer("vDNS", "ip.DEFAULT.GLOBAL")
 vdns.addConstantContextProvider("nodeType", DNSSERVER)
-WNS.nodes.append(vdns)
-WNS.nodes += stations + routers
+WNS.simulationModel.nodes.append(vdns)
+WNS.simulationModel.nodes += stations + routers
 
 WNS.maxSimTime = 10.0
 
-wns.Logger.globalRegistry.setAttribute("IP", "enabled", True)
+openwns.logger.globalRegistry.setAttribute("IP", "enabled", True)
 
 
 # add new style probes of ip
@@ -162,4 +163,4 @@ ip.evaluation.default.installEvaluation(sim = WNS,
                                        maxPacketThroughput = 1E6 # Packets/s
                                        )
 
-
+openwns.setSimulator(WNS)
